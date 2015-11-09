@@ -14,11 +14,12 @@ resource "atlas_artifact" "httpd" {
 resource "aws_instance" "httpd" {
   ami           = "${atlas_artifact.httpd.metadata_full.region-us-east-1}"
   instance_type = "t2.micro"
+
   vpc_security_group_ids = [
     "${aws_security_group.httpd.id}",
   ]
 
-  tags {
+  tags = {
     Name = "httpd"
   }
 }
