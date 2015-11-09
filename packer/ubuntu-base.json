@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "region":             "us-east-1",
+    "source_ami":         "ami-9a562df2",
+    "atlas_username":     "clstokes",
+    "atlas_name":         "atlas-pipeline-ubuntu-base"
+  },
+  "builders": [
+    {
+      "type":          "amazon-ebs",
+      "region":        "{{user `region`}}",
+      "source_ami":    "{{user `source_ami`}}",
+      "instance_type": "t2.micro",
+      "ssh_username":  "ubuntu",
+      "ami_name":      "{{user `atlas_username`}}-{{user `atlas_name`}}-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type":   "shell",
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get upgrade -y"
+      ]
+    }
+  ],
+  "push": {
+    "name":     "{{user `atlas_username`}}/{{user `atlas_name`}}",
+    "vcs":      false
+  },
+  "post-processors": [
+    [
+      {
+        "type":          "atlas",
+        "artifact":      "{{user `atlas_username`}}/{{user `atlas_name`}}",
+        "artifact_type": "amazon.image",
+        "metadata": {
+          "created_at": "{{timestamp}}"
+        }
+      }
+    ]
+  ]
+}

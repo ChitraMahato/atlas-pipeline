@@ -1,0 +1,65 @@
+{
+  "variables": {
+    "region":             "us-east-1",
+    "source_ami":         "{{env `ATLAS_BASE_ARTIFACT_AMAZON_IMAGE_ID`}}",
+    "atlas_username":     "clstokes",
+    "atlas_name":         "atlas-pipeline-httpd"
+  },
+  "builders": [
+    {
+      "type":          "amazon-ebs",
+      "region":        "{{user `region`}}",
+      "source_ami":    "{{user `source_ami`}}",
+      "instance_type": "t2.micro",
+      "ssh_username":  "ubuntu",
+      "ami_name":      "{{user `atlas_username`}}-{{user `atlas_name`}}-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell-local",
+      "command": "pwd"
+    },
+    {
+      "type": "shell-local",
+      "command": "find ."
+    },
+    {
+      "type":   "shell",
+      "inline": [
+        "sudo apt-get update -y",
+        "sudo apt-get install -y apache2"
+      ]
+    },
+    {
+       "type": "file",
+       "source": "app",
+       "destination": "/tmp/"
+   },
+   {
+     "type":   "shell",
+     "inline": [
+       "cd /tmp/",
+       "find .",
+       "sudo cp -r /tmp/app/* /var/www/html/",
+       "cat /var/www/html/index.html"
+     ]
+   }
+  ],
+  "push": {
+    "name":     "{{user `atlas_username`}}/{{user `atlas_name`}}",
+    "vcs":      false
+  },
+  "post-processors": [
+    [
+      {
+        "type":          "atlas",
+        "artifact":      "{{user `atlas_username`}}/{{user `atlas_name`}}",
+        "artifact_type": "amazon.image",
+        "metadata": {
+          "created_at": "{{timestamp}}"
+        }
+      }
+    ]
+  ]
+}

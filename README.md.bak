@@ -1,0 +1,18 @@
+# atlas-pipline
+
+A simple example project for deploying a static website with HashiCorp's
+[Atlas](https://atlas.hashicorp.com/) application delivery pipeline.
+
+# Setup
+
+## Environment Variables
+
+Setup the following environment variables on your local workstation:
+
+```
+export ATLAS_TOKEN=<TOKEN>
+```
+
+## Import into Atlas
+
+Follow these steps to import the Packer templates, Application code, and 
