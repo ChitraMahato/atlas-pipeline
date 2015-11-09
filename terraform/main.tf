@@ -15,7 +15,6 @@ resource "aws_instance" "httpd" {
   ami           = "${atlas_artifact.httpd.metadata_full.region-us-east-1}"
   instance_type = "t2.micro"
   vpc_security_group_ids = [
-    "${aws_security_group.default_egress.id}",
     "${aws_security_group.httpd.id}",
   ]
 
@@ -24,23 +23,18 @@ resource "aws_instance" "httpd" {
   }
 }
 
-resource "aws_security_group" "default_egress" {
-  name        = "default_egress"
-  description = "Default Egress"
+resource "aws_security_group" "httpd" {
+  name        = "httpd"
+  description = "httpd"
 }
 
 resource "aws_security_group_rule" "default_egress" {
-  security_group_id = "${aws_security_group.default_egress.id}"
+  security_group_id = "${aws_security_group.httpd.id}"
   type              = "egress"
   protocol          = "-1"
   from_port         = 0
   to_port           = 0
   cidr_blocks       = ["0.0.0.0/0"]
-}
-
-resource "aws_security_group" "httpd" {
-  name        = "httpd"
-  description = "HTTP"
 }
 
 resource "aws_security_group_rule" "httpd" {
